@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Highlight Text with Regex</title>
+    <title>Regex Text Highlighter (OOP)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,53 +32,102 @@
     </style>
 </head>
 <body>
-    <h1>Regex Text Highlighter</h1>
+    <h1>Regex Text Highlighter (OOP)</h1>
     <textarea id="textInput" placeholder="Enter your text here..."></textarea>
     <input type="text" id="regexInput" placeholder="Enter a Python-style regex pattern...">
     <div id="output"></div>
 
     <script>
-        const textInput = document.getElementById('textInput');
-        const regexInput = document.getElementById('regexInput');
-        const outputDiv = document.getElementById('output');
+        // Classe Model
+        class Model {
+            constructor() {
+                this.text = '';
+                this.regexPattern = '';
+            }
 
-        function highlightText() {
-            const text = textInput.value;
-            const regexPattern = regexInput.value;
+            setText(text) {
+                this.text = text;
+            }
 
-            try {
-                // Create a RegExp object from the input pattern
-                const regex = new RegExp(regexPattern, 'g');
+            setRegexPattern(regexPattern) {
+                this.regexPattern = regexPattern;
+            }
 
-                // Split the text by the regex matches and wrap matches in a span with the highlight class
-                const parts = text.split(regex);
-                const matches = text.match(regex) || [];
+            getHighlightedText() {
+                try {
+                    const regex = new RegExp(this.regexPattern, 'g');
+                    const parts = this.text.split(regex);
+                    const matches = this.text.match(regex) || [];
+                    let result = '';
 
-                // Clear the output div
-                outputDiv.innerHTML = '';
+                    parts.forEach((part, index) => {
+                        result += part;
+                        if (index < matches.length) {
+                            result += `<span class="highlight">${matches[index]}</span>`;
+                        }
+                    });
 
-                // Reconstruct the text with highlighted matches
-                parts.forEach((part, index) => {
-                    outputDiv.appendChild(document.createTextNode(part));
-                    if (index < matches.length) {
-                        const highlightSpan = document.createElement('span');
-                        highlightSpan.className = 'highlight';
-                        highlightSpan.textContent = matches[index];
-                        outputDiv.appendChild(highlightSpan);
-                    }
-                });
-            } catch (error) {
-                // If the regex is invalid, display an error message
-                outputDiv.textContent = 'Invalid regex pattern.';
+                    return result;
+                } catch (error) {
+                    return 'Invalid regex pattern.';
+                }
             }
         }
 
-        // Add event listeners to update highlights in real-time
-        textInput.addEventListener('input', highlightText);
-        regexInput.addEventListener('input', highlightText);
+        // Classe View
+        class View {
+            constructor() {
+                this.textInput = document.getElementById('textInput');
+                this.regexInput = document.getElementById('regexInput');
+                this.outputDiv = document.getElementById('output');
+            }
 
-        // Initial call to populate the output
-        highlightText();
+            getText() {
+                return this.textInput.value;
+            }
+
+            getRegexPattern() {
+                return this.regexInput.value;
+            }
+
+            updateOutput(htmlContent) {
+                this.outputDiv.innerHTML = htmlContent;
+            }
+
+            bindInputEvent(handler) {
+                this.textInput.addEventListener('input', handler);
+                this.regexInput.addEventListener('input', handler);
+            }
+        }
+
+        // Classe Controller
+        class Controller {
+            constructor(model, view) {
+                this.model = model;
+                this.view = view;
+
+                this.view.bindInputEvent(() => this.handleInput());
+                this.handleInput(); // Initial call to populate the output
+            }
+
+            handleInput() {
+                const text = this.view.getText();
+                const regexPattern = this.view.getRegexPattern();
+
+                this.model.setText(text);
+                this.model.setRegexPattern(regexPattern);
+
+                const highlightedText = this.model.getHighlightedText();
+                this.view.updateOutput(highlightedText);
+            }
+        }
+
+        // Inicialização da aplicação
+        document.addEventListener('DOMContentLoaded', () => {
+            const model = new Model();
+            const view = new View();
+            const controller = new Controller(model, view);
+        });
     </script>
 </body>
 </html>
