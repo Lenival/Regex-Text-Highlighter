@@ -56,18 +56,8 @@
             getHighlightedText() {
                 try {
                     const regex = new RegExp(this.regexPattern, 'g');
-                    const parts = this.text.split(regex);
-                    const matches = this.text.match(regex) || [];
-                    let result = '';
-
-                    parts.forEach((part, index) => {
-                        result += part;
-                        if (index < matches.length) {
-                            result += `<span class="highlight">${matches[index]}</span>`;
-                        }
-                    });
-
-                    return result;
+                    // Substitui todas as correspondências da regex por elas mesmas envoltas em <span>
+                    return this.text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
                 } catch (error) {
                     return 'Invalid regex pattern.';
                 }
