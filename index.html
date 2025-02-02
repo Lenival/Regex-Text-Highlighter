@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlight Text with Regex</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        input {
+            width: 100%;
+            padding: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .highlight {
+            background-color: lightgreen;
+        }
+        #output {
+            white-space: pre-wrap;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Regex Text Highlighter</h1>
+    <textarea id="textInput" placeholder="Enter your text here..."></textarea>
+    <input type="text" id="regexInput" placeholder="Enter a Python-style regex pattern...">
+    <div id="output"></div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const regexInput = document.getElementById('regexInput');
+        const outputDiv = document.getElementById('output');
+
+        function highlightText() {
+            const text = textInput.value;
+            const regexPattern = regexInput.value;
+
+            try {
+                // Create a RegExp object from the input pattern
+                const regex = new RegExp(regexPattern, 'g');
+
+                // Split the text by the regex matches and wrap matches in a span with the highlight class
+                const parts = text.split(regex);
+                const matches = text.match(regex) || [];
+
+                // Clear the output div
+                outputDiv.innerHTML = '';
+
+                // Reconstruct the text with highlighted matches
+                parts.forEach((part, index) => {
+                    outputDiv.appendChild(document.createTextNode(part));
+                    if (index < matches.length) {
+                        const highlightSpan = document.createElement('span');
+                        highlightSpan.className = 'highlight';
+                        highlightSpan.textContent = matches[index];
+                        outputDiv.appendChild(highlightSpan);
+                    }
+                });
+            } catch (error) {
+                // If the regex is invalid, display an error message
+                outputDiv.textContent = 'Invalid regex pattern.';
+            }
+        }
+
+        // Add event listeners to update highlights in real-time
+        textInput.addEventListener('input', highlightText);
+        regexInput.addEventListener('input', highlightText);
+
+        // Initial call to populate the output
+        highlightText();
+    </script>
+</body>
+</html>
